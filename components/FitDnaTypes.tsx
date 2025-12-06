@@ -7,7 +7,7 @@ interface FitDnaTypesProps {
   onStartTest?: () => void;
 }
 
-const fitDnaTypes = [
+export const fitDnaTypes = [
   {
     code: 'PFE',
     nickname: '완성형 올라운더',
@@ -54,7 +54,7 @@ const fitDnaTypes = [
     icon: 'Music',
   },
   {
-    code: 'LFQ',
+    code: 'LFG',
     nickname: '유연 동작형',
     description: '유연성 지표가 상위로 나타나는 유형',
     description2: '몸의 가동 범위나 움직임의 넓이에서 높은 수치를 보여주는 타입',

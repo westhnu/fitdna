@@ -30,6 +30,18 @@ const regionData: { [key: string]: string[] } = {
 
 const fitDnaTypes = ['PFE', 'PFQ', 'PSE', 'PSQ', 'LFE', 'LFG', 'LSE', 'LSQ'];
 
+// 60개 운동 종목 (사전순 정렬)
+const sportsList = [
+  '가라테', '검도', '게이트볼', '골프 (스크린골프 포함)', '국학기공', '궁도', '그라운드골프', '근대5종',
+  '농구', '당구 (포켓볼 포함)', '댄스스포츠', '럭비', '레슬링', '롤러 (인라인/하키 등)', '루지', '바둑',
+  '바이애슬론', '배구', '배드민턴', '보디빌딩 (헬스)', '복싱 (권투)', '볼링', '봅슬레이/스켈레톤', '빙상 (스케이트/피겨 등)',
+  '사격', '산악 (등산, 클라이밍 등)', '세팍타크로', '소프트테니스 (정구)', '수상스키/웨이크보드', '수영 (수중발레, 다이빙, 수구 등)', '스쿼시', '스키/스노우보드',
+  '승마', '씨름', '아이스하키', '야구/소프트볼', '양궁', '에어로빅', '역도', '요트',
+  '우슈', '유도', '육상 (단거리, 중거리, 마라톤 등)', '자전거 (사이클, MTB 등)', '조정', '족구', '주짓수', '줄넘기',
+  '철인3종 (트라이애슬론)', '체조 (맨손/생활체조 등)', '축구', '카누', '컬링', '탁구', '태권도', '택견',
+  '테니스', '파크골프', '패러글라이딩 (행글라이딩)', '펜싱', '핀수영', '하키 (필드하키)', '합기도', '핸드볼'
+];
+
 export function MateMatching({ onBack }: MateMatchingProps) {
   const [selectedProvince, setSelectedProvince] = useState<string>('');
   const [selectedCity, setSelectedCity] = useState<string>('');
@@ -54,6 +66,26 @@ export function MateMatching({ onBack }: MateMatchingProps) {
     } else {
       setSelectedFitDna([...selectedFitDna, type]);
     }
+  };
+
+  const handleSportToggle = (sport: string) => {
+    if (selectedSports.includes(sport)) {
+      setSelectedSports(selectedSports.filter(s => s !== sport));
+    } else {
+      setSelectedSports([...selectedSports, sport]);
+    }
+  };
+
+  // 운동 종목에서 메인 이름과 괄호 부분 분리
+  const parseSportName = (sport: string) => {
+    const match = sport.match(/^(.+?)\s(\(.+\))$/);
+    if (match) {
+      return {
+        main: match[1],
+        sub: match[2]
+      };
+    }
+    return { main: sport, sub: null };
   };
 
   return (
@@ -127,11 +159,35 @@ export function MateMatching({ onBack }: MateMatchingProps) {
                 </div>
               </div>
 
-              {/* 운동 종류 - 나중에 추가 예정 */}
+              {/* 운동 종류 */}
               <div className="mb-6">
                 <label className="text-sm text-neutral-600 mb-2 block">운동 종류</label>
-                <div className="text-sm text-neutral-400 py-4 text-center border border-dashed border-neutral-200 rounded-lg">
-                  추가 예정
+                <div className="max-h-64 overflow-y-auto border border-neutral-200 rounded-lg p-3">
+                  <div className="grid grid-cols-2 gap-2">
+                    {sportsList.map((sport) => {
+                      const { main, sub } = parseSportName(sport);
+                      return (
+                        <button
+                          key={sport}
+                          onClick={() => handleSportToggle(sport)}
+                          className={`p-2 rounded-lg text-xs transition-colors text-center flex flex-col items-center justify-center ${
+                            selectedSports.includes(sport)
+                              ? 'bg-neutral-900 text-white'
+                              : 'bg-neutral-100 text-neutral-700 hover:bg-neutral-200'
+                          }`}
+                        >
+                          <span>{main}</span>
+                          {sub && (
+                            <span className={`text-xs mt-0.5 ${
+                              selectedSports.includes(sport) ? 'text-neutral-300' : 'text-neutral-500'
+                            }`}>
+                              {sub}
+                            </span>
+                          )}
+                        </button>
+                      );
+                    })}
+                  </div>
                 </div>
               </div>
 
