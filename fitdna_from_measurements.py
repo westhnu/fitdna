@@ -4,7 +4,7 @@
 """
 
 import pickle
-from fitdna_calculator import calculate_fitdna, get_fitdna_description
+from fitdna_calculator import calculate_fitdna, get_fitdna_description, classify_axis_levels
 
 
 def load_reference_table(pkl_path='fitdna_original_reference.pkl'):
@@ -51,7 +51,14 @@ def calculate_measurement_zscore(value, age, gender, measurement_type, ref_table
     return zscore
 
 
-def calculate_fitdna_from_measurements(age, gender, measurements, ref_table, threshold=0.5):
+def calculate_fitdna_from_measurements(
+    age,
+    gender,
+    measurements,
+    ref_table,
+    threshold=0.0,
+    debug=False
+):
     """
     사용자 측정값에서 FIT-DNA 계산
 
@@ -75,7 +82,9 @@ def calculate_fitdna_from_measurements(age, gender, measurements, ref_table, thr
     ref_table : dict
         참조 테이블
     threshold : float
-        High/Low 기준값 (기본: 0.5)
+        High/Low 기준값 (기본: 0.0 → Z-Score 0 기준)
+    debug : bool
+        디버깅 로그 출력 여부
 
     Returns:
     --------
@@ -103,8 +112,11 @@ def calculate_fitdna_from_measurements(age, gender, measurements, ref_table, thr
                     measurements[item], age, gender, item, ref_table
                 )
                 strength_zscores.append(z)
-            except ValueError:
-                pass  # 참조 데이터 없으면 스킵
+            except ValueError as e:
+                if debug:
+                    print(f"[FITDNA DEBUG] 근력 항목 '{item}' 참조값 없음 → 스킵 ({e})")
+                # 참조 데이터 없으면 스킵
+                pass
 
     if not strength_zscores:
         raise ValueError("근력 측정값이 필요합니다 (grip_right, grip_left, standing_long_jump, sit_up 중 1개 이상)")
@@ -117,14 +129,16 @@ def calculate_fitdna_from_measurements(age, gender, measurements, ref_table, thr
             flex_z = calculate_measurement_zscore(
                 measurements['sit_and_reach'], age, gender, 'sit_and_reach', ref_table
             )
-        except ValueError:
+        except ValueError as e:
             # 참조 데이터 없으면 중립값(0) 사용
             flex_z = 0.0
-            print(f"  경고: sit_and_reach 참조 데이터 없음, 중립값(0) 사용")
+            if debug:
+                print(f"[FITDNA DEBUG] sit_and_reach 참조값 없음 → flex_z=0.0 사용 ({e})")
     else:
         # 유연성 데이터 없으면 중립값(0) 사용
         flex_z = 0.0
-        print(f"  경고: sit_and_reach 측정값 없음, 중립값(0) 사용")
+        if debug:
+            print("[FITDNA DEBUG] sit_and_reach 측정값 없음 → flex_z=0.0 사용")
 
     # 지구력 축
     endurance_items = ['vo2max', 'shuttle_run']
@@ -137,7 +151,9 @@ def calculate_fitdna_from_measurements(age, gender, measurements, ref_table, thr
                     measurements[item], age, gender, item, ref_table
                 )
                 endurance_zscores.append(z)
-            except ValueError:
+            except ValueError as e:
+                if debug:
+                    print(f"[FITDNA DEBUG] 지구력 항목 '{item}' 참조값 없음 → 스킵 ({e})")
                 pass
 
     if not endurance_zscores:
@@ -149,20 +165,35 @@ def calculate_fitdna_from_measurements(age, gender, measurements, ref_table, thr
     fitdna_type = calculate_fitdna(strength_z, flex_z, endurance_z, threshold)
     info = get_fitdna_description(fitdna_type)
 
+    # 실제 Z-Score 기준으로 각 축 High/Low 재계산
+    strength_level, flexibility_level, endurance_level = classify_axis_levels(
+        strength_z, flex_z, endurance_z, threshold
+    )
+
+    if debug:
+        print("\n[FITDNA DEBUG] ===============================")
+        print(f"age={age}, gender={gender}")
+        print(f"measurements={measurements}")
+        print(f"Z-scores → strength={strength_z:.2f}, flex={flex_z:.2f}, endurance={endurance_z:.2f}")
+        print(f"levels   → strength={strength_level}, flex={flexibility_level}, endurance={endurance_level}")
+        print(f"threshold={threshold}")
+        print(f"FIT-DNA  → {fitdna_type} ({info['name']})")
+        print("[FITDNA DEBUG] ===============================\n")
+
     # 3. 결과 반환
     return {
         'fitdna_type': fitdna_type,
         'type_name': info['name'],
         'description': info['description'],
-        'strength_level': info['strength'],
-        'flexibility_level': info['flexibility'],
-        'endurance_level': info['endurance'],
+        'strength_level': strength_level,
+        'flexibility_level': flexibility_level,
+        'endurance_level': endurance_level,
         'strength_z': round(strength_z, 2),
         'flexibility_z': round(flex_z, 2),
         'endurance_z': round(endurance_z, 2),
         'measurements_used': {
             'strength_items': [k for k in strength_items if k in measurements],
-            'flexibility_items': ['sit_and_reach'],
+            'flexibility_items': ['sit_and_reach'] if 'sit_and_reach' in measurements else [],
             'endurance_items': [k for k in endurance_items if k in measurements]
         },
         'age': age,
@@ -211,7 +242,8 @@ if __name__ == "__main__":
             user_a['age'],
             user_a['gender'],
             user_a['measurements'],
-            ref_table
+            ref_table,
+            debug=True  # 예시에서는 디버깅 켜서 확인
         )
 
         print(f"\n결과:")
@@ -249,7 +281,8 @@ if __name__ == "__main__":
             user_b['age'],
             user_b['gender'],
             user_b['measurements'],
-            ref_table
+            ref_table,
+            debug=True  # 여기도 디버깅 켜서 패턴 확인
         )
 
         print(f"\n결과:")
