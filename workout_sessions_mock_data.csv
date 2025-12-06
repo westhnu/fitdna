@@ -1,0 +1,46 @@
+﻿user_id,year,month,date,exercise_type,exercises,duration,intensity,completed
+1,2025,9,2025-09-03,endurance,['왕복오래달리기'],46,high,True
+1,2025,9,2025-09-05,flexibility,"['필라테스', '폼롤러']",56,medium,True
+1,2025,9,2025-09-06,endurance,"['조깅', '계단오르기']",40,medium,True
+1,2025,9,2025-09-11,endurance,['왕복오래달리기'],60,high,True
+1,2025,9,2025-09-12,endurance,['인터벌 러닝'],45,medium,True
+1,2025,9,2025-09-16,flexibility,['필라테스'],49,medium,True
+1,2025,9,2025-09-18,strength,"['풀업', '딥스', '플랭크']",50,high,True
+1,2025,9,2025-09-20,strength,"['풀업', '딥스', '플랭크']",59,medium,True
+1,2025,9,2025-09-23,flexibility,"['필라테스', '폼롤러']",46,low,True
+1,2025,9,2025-09-24,strength,"['벤치프레스', '로우']",56,high,True
+1,2025,9,2025-09-27,flexibility,"['요가', '스트레칭']",58,low,True
+1,2025,9,2025-09-28,flexibility,"['스트레칭', '폼롤러']",46,medium,True
+1,2025,10,2025-10-01,flexibility,['필라테스'],54,low,True
+1,2025,10,2025-10-04,endurance,['왕복오래달리기'],51,high,True
+1,2025,10,2025-10-06,strength,"['스쿼트', '런지', '카프레이즈']",56,medium,True
+1,2025,10,2025-10-09,strength,"['풀업', '딥스', '플랭크']",57,high,True
+1,2025,10,2025-10-10,flexibility,['필라테스'],47,medium,True
+1,2025,10,2025-10-14,strength,"['스쿼트', '푸시업', '플랭크']",73,medium,True
+1,2025,10,2025-10-16,strength,"['스쿼트', '푸시업', '플랭크']",55,medium,True
+1,2025,10,2025-10-19,endurance,"['조깅', '버피테스트']",42,high,True
+1,2025,10,2025-10-21,flexibility,"['필라테스', '폼롤러']",49,low,True
+1,2025,10,2025-10-24,flexibility,['필라테스'],54,medium,True
+1,2025,10,2025-10-25,strength,"['스쿼트', '푸시업', '플랭크']",58,medium,True
+1,2025,10,2025-10-26,endurance,['왕복오래달리기'],52,medium,True
+1,2025,10,2025-10-27,endurance,"['조깅', '버피테스트']",60,medium,True
+1,2025,10,2025-10-28,flexibility,['필라테스'],58,low,True
+1,2025,10,2025-10-29,endurance,"['조깅', '계단오르기']",59,high,True
+1,2025,11,2025-11-01,strength,"['스쿼트', '런지', '카프레이즈']",65,medium,True
+1,2025,11,2025-11-02,endurance,['왕복오래달리기'],48,medium,True
+1,2025,11,2025-11-03,endurance,"['조깅', '버피테스트']",40,high,True
+1,2025,11,2025-11-06,flexibility,"['스트레칭', '폼롤러']",53,medium,True
+1,2025,11,2025-11-07,flexibility,['필라테스'],60,medium,True
+1,2025,11,2025-11-09,strength,"['레그프레스', '숄더프레스']",75,high,True
+1,2025,11,2025-11-11,strength,"['레그프레스', '숄더프레스']",75,high,True
+1,2025,11,2025-11-13,strength,"['스쿼트', '런지', '카프레이즈']",71,high,True
+1,2025,11,2025-11-15,flexibility,['필라테스'],58,low,True
+1,2025,11,2025-11-17,flexibility,"['필라테스', '폼롤러']",51,low,True
+1,2025,11,2025-11-18,flexibility,"['요가', '스트레칭']",54,medium,True
+1,2025,11,2025-11-19,flexibility,['필라테스'],50,low,True
+1,2025,11,2025-11-22,endurance,['사이클링'],52,medium,True
+1,2025,11,2025-11-23,strength,"['스쿼트', '푸시업', '플랭크']",50,medium,True
+1,2025,11,2025-11-25,flexibility,['필라테스'],58,low,True
+1,2025,11,2025-11-26,strength,"['스쿼트', '푸시업', '플랭크']",55,high,True
+1,2025,11,2025-11-29,strength,"['벤치프레스', '로우']",70,high,True
+1,2025,11,2025-11-30,flexibility,"['필라테스', '폼롤러']",58,low,True

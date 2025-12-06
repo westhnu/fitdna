@@ -1,0 +1,85 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# 환경 변수
+.env
+.env.local
+.env.*.local
+
+# 데이터베이스
+*.db
+*.sqlite
+*.sqlite3
+fitdna.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# 업로드 파일
+uploads/
+*.log
+
+# Node.js (프론트엔드)
+node_modules/
+.npm
+.eslintcache
+
+# 빌드 파일
+dist/
+build/
+.next/
+out/
+
+# 임시 파일
+*.tmp
+*.bak
+.cache/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# 테스트
+.pytest_cache/
+.coverage
+htmlcov/
+
+# 모델 파일 (너무 크면 제외, 아니면 포함)
+# *.pkl
+# *.csv
+
+# 대용량 파일 제외
+map_2k.html
+backend/facilities_data.json
+최종/
+*.CSV
+
