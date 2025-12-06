@@ -1,222 +1,236 @@
-import React, { useState } from 'react';
-import { MonthlyReport } from './MonthlyReport';
-import { mockMonthlyReport, mockMonthlyReports } from '../data/mockMonthlyReport';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
-import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
-import { Badge } from './ui/badge';
+import { ArrowLeft, User, Settings, Bell, HelpCircle, Shield, LogOut, ChevronRight } from 'lucide-react';
 import { Button } from './ui/button';
+import { Card } from './ui/card';
+import { Switch } from './ui/switch';
+import { useEffect, useState } from 'react';
+import { InbodyResult } from './InbodyResult';
 
-// 임시 사용자 데이터
-const mockUser = {
-  name: '김체력',
-  email: 'fitness@example.com',
-  age: 28,
-  gender: 'M' as const,
-  fitDnaType: 'PFE',
-  fitDnaName: '파워 애슬리트',
-  joinDate: '2025-09-01',
-  profileImage: '',
-};
+interface MyPageProps {
+  onBack: () => void;
+  onLogout: () => void;
+  onProfileEdit: () => void;
+  onInbodyUpload: () => void;
+  onFitDnaTest: () => void;
+}
 
-export function MyPage() {
-  const [selectedMonth, setSelectedMonth] = useState(11); // 11월
+export function MyPage({ onBack, onLogout, onProfileEdit, onInbodyUpload, onFitDnaTest }: MyPageProps) {
+  const [testData, setTestData] = useState<any>(null);
+  const [userData, setUserData] = useState<any>(null);
+  const [inbodyData, setInbodyData] = useState<any>(null);
 
-  // 선택된 월의 리포트 가져오기
-  const currentReport = mockMonthlyReports.find((r) => r.month === selectedMonth) || mockMonthlyReport;
+  // 나이 계산 함수
+  const calculateAge = (birthdate: string) => {
+    const today = new Date();
+    const birth = new Date(birthdate);
+    let age = today.getFullYear() - birth.getFullYear();
+    const monthDiff = today.getMonth() - birth.getMonth();
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
+      age--;
+    }
+    return age;
+  };
+
+  useEffect(() => {
+    // 로컬 스토리지에서 테스트 데이터 불러오기
+    const savedTestData = localStorage.getItem('fitDnaTestData');
+    if (savedTestData) {
+      setTestData(JSON.parse(savedTestData));
+    }
+
+    // 사용자 정보 불러오기
+    const savedUserData = localStorage.getItem('userData');
+    if (savedUserData) {
+      setUserData(JSON.parse(savedUserData));
+    }
+
+    // 인바디 데이터 불러오기
+    const savedInbodyData = localStorage.getItem('inbodyData');
+    if (savedInbodyData) {
+      setInbodyData(JSON.parse(savedInbodyData));
+    }
+  }, []);
 
   return (
-    <div className="container mx-auto p-6 max-w-7xl">
-      {/* 사용자 프로필 섹션 */}
-      <Card className="mb-6">
-        <CardContent className="pt-6">
-          <div className="flex items-center gap-6">
-            <Avatar className="h-24 w-24">
-              <AvatarImage src={mockUser.profileImage} alt={mockUser.name} />
-              <AvatarFallback className="text-2xl bg-blue-600 text-white">
-                {mockUser.name.charAt(0)}
-              </AvatarFallback>
-            </Avatar>
-            <div className="flex-1">
-              <h1 className="text-3xl font-bold mb-2">{mockUser.name}님의 마이페이지</h1>
-              <div className="flex items-center gap-3 mb-3">
-                <Badge className="bg-purple-600 text-white px-3 py-1">
-                  FIT-DNA: {mockUser.fitDnaType}
-                </Badge>
-                <span className="text-gray-600">{mockUser.fitDnaName}</span>
-              </div>
-              <div className="flex gap-4 text-sm text-gray-600">
-                <span>나이: {mockUser.age}세</span>
-                <span>성별: {mockUser.gender === 'M' ? '남성' : '여성'}</span>
-                <span>가입일: {mockUser.joinDate}</span>
-              </div>
-            </div>
-            <Button variant="outline">프로필 수정</Button>
-          </div>
-        </CardContent>
-      </Card>
+    <div className="min-h-screen bg-neutral-50">
+      {/* Header */}
+      <header className="bg-white border-b border-neutral-200">
+        <div className="max-w-7xl mx-auto px-8 py-4 flex items-center gap-4">
+          <Button variant="ghost" size="icon" onClick={onBack}>
+            <ArrowLeft className="w-5 h-5" />
+          </Button>
+          <h1 className="text-neutral-900">마이</h1>
+        </div>
+      </header>
 
-      {/* 탭 메뉴 */}
-      <Tabs defaultValue="monthly-report" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-4">
-          <TabsTrigger value="monthly-report">월간 리포트</TabsTrigger>
-          <TabsTrigger value="workout-history">운동 기록</TabsTrigger>
-          <TabsTrigger value="fitdna-history">FIT-DNA 이력</TabsTrigger>
-          <TabsTrigger value="settings">설정</TabsTrigger>
-        </TabsList>
+      {/* Main Content */}
+      <main className="max-w-7xl mx-auto px-8 py-12">
+        <div className="grid grid-cols-3 gap-6">
+          {/* Left Column */}
+          <div className="col-span-2 space-y-6">
+            {/* Profile Card */}
+            <Card className="p-8 border border-neutral-200 bg-white">
+              <div className="flex items-center gap-6">
+                <div className="w-24 h-24 rounded-full bg-neutral-100 flex items-center justify-center">
+                  <User className="w-12 h-12 text-neutral-400" />
+                </div>
+                <div className="flex-1">
+                  <h2 className="text-neutral-900 mb-1">{userData?.name || '사용자 이름'}</h2>
+                  <p className="text-neutral-500 mb-4">{userData?.email || 'user@example.com'}</p>
+                  <Button variant="outline" size="sm" className="border-neutral-200" onClick={onProfileEdit}>
+                    프로필 수정
+                  </Button>
+                </div>
+              </div>
+            </Card>
 
-        {/* 월간 리포트 탭 */}
-        <TabsContent value="monthly-report" className="space-y-4">
-          {/* 월 선택 */}
-          <div className="flex justify-between items-center">
-            <h2 className="text-2xl font-bold">월간 운동 리포트</h2>
-            <div className="flex gap-2">
-              {mockMonthlyReports.map((report) => (
-                <Button
-                  key={report.month}
-                  variant={selectedMonth === report.month ? 'default' : 'outline'}
-                  onClick={() => setSelectedMonth(report.month)}
-                  size="sm"
-                >
-                  {report.month}월
+            {/* 기본 정보 (저장된 데이터 표시) */}
+            {testData && testData.userInfo && (
+              <Card className="p-6 border border-neutral-200 bg-white">
+                <h3 className="text-neutral-900 mb-4">기본 정보</h3>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="p-4 bg-neutral-50 rounded-lg">
+                    <p className="text-neutral-600 text-sm mb-1">나이</p>
+                    <p className="text-neutral-900">
+                      {testData.userInfo.birthdate 
+                        ? `${calculateAge(testData.userInfo.birthdate)}세`
+                        : `${testData.userInfo.age}세`}
+                    </p>
+                  </div>
+                  <div className="p-4 bg-neutral-50 rounded-lg">
+                    <p className="text-neutral-600 text-sm mb-1">성별</p>
+                    <p className="text-neutral-900">{testData.userInfo.gender}</p>
+                  </div>
+                  <div className="p-4 bg-neutral-50 rounded-lg">
+                    <p className="text-neutral-600 text-sm mb-1">체중</p>
+                    <p className="text-neutral-900">{testData.userInfo.weight}kg</p>
+                  </div>
+                  <div className="p-4 bg-neutral-50 rounded-lg">
+                    <p className="text-neutral-600 text-sm mb-1">신장</p>
+                    <p className="text-neutral-900">{testData.userInfo.height}cm</p>
+                  </div>
+                </div>
+              </Card>
+            )}
+
+            {/* 인바디 결과 */}
+            <InbodyResult data={inbodyData} onUpload={onInbodyUpload} />
+
+            {/* FIT-DNA Result (if available) */}
+            <Card className="p-6 border border-neutral-200 bg-white">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-neutral-900">나의 FIT-DNA</h3>
+                <Button variant="ghost" size="sm">
+                  <ChevronRight className="w-4 h-4" />
                 </Button>
-              ))}
+              </div>
+              <div className="p-4 bg-neutral-50 rounded-lg text-center">
+                <p className="text-neutral-500 text-sm">아직 FIT-DNA 테스트를 완료하지 않았습니다</p>
+                <Button size="sm" className="mt-3" onClick={onFitDnaTest}>테스트 시작하기</Button>
+              </div>
+            </Card>
+
+            {/* Settings Sections */}
+            <div className="space-y-3">
+              <h3 className="text-neutral-900">설정</h3>
+              
+              {/* Account Settings */}
+              <Card className="p-5 border border-neutral-200 bg-white">
+                <button className="w-full flex items-center justify-between hover:bg-neutral-50 -m-5 p-5 rounded-lg">
+                  <div className="flex items-center gap-3">
+                    <Settings className="w-5 h-5 text-neutral-700" />
+                    <span className="text-neutral-900">계정 설정</span>
+                  </div>
+                  <ChevronRight className="w-5 h-5 text-neutral-400" />
+                </button>
+              </Card>
+
+              {/* Notifications */}
+              <Card className="p-5 border border-neutral-200 bg-white">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <Bell className="w-5 h-5 text-neutral-700" />
+                    <span className="text-neutral-900">알림 설정</span>
+                  </div>
+                  <Switch />
+                </div>
+              </Card>
+
+              {/* Privacy */}
+              <Card className="p-5 border border-neutral-200 bg-white">
+                <button className="w-full flex items-center justify-between hover:bg-neutral-50 -m-5 p-5 rounded-lg">
+                  <div className="flex items-center gap-3">
+                    <Shield className="w-5 h-5 text-neutral-700" />
+                    <span className="text-neutral-900">개인정보 처리방침</span>
+                  </div>
+                  <ChevronRight className="w-5 h-5 text-neutral-400" />
+                </button>
+              </Card>
+
+              {/* Help */}
+              <Card className="p-5 border border-neutral-200 bg-white">
+                <button className="w-full flex items-center justify-between hover:bg-neutral-50 -m-5 p-5 rounded-lg">
+                  <div className="flex items-center gap-3">
+                    <HelpCircle className="w-5 h-5 text-neutral-700" />
+                    <span className="text-neutral-900">도움말</span>
+                  </div>
+                  <ChevronRight className="w-5 h-5 text-neutral-400" />
+                </button>
+              </Card>
+
+              {/* Logout */}
+              <Card className="p-5 border border-neutral-200 bg-white">
+                <button 
+                  className="w-full flex items-center justify-between hover:bg-neutral-50 -m-5 p-5 rounded-lg"
+                  onClick={onLogout}
+                >
+                  <div className="flex items-center gap-3">
+                    <LogOut className="w-5 h-5 text-neutral-700" />
+                    <span className="text-neutral-900">로그아웃</span>
+                  </div>
+                  <ChevronRight className="w-5 h-5 text-neutral-400" />
+                </button>
+              </Card>
             </div>
           </div>
 
-          {/* 월간 리포트 컴포넌트 */}
-          <MonthlyReport data={currentReport} />
-        </TabsContent>
-
-        {/* 운동 기록 탭 */}
-        <TabsContent value="workout-history">
-          <Card>
-            <CardHeader>
-              <CardTitle>운동 기록</CardTitle>
-              <CardDescription>모든 운동 세션 기록을 확인할 수 있습니다</CardDescription>
-            </CardHeader>
-            <CardContent>
+          {/* Right Sidebar */}
+          <div className="space-y-6">
+            {/* Activity Summary */}
+            <Card className="p-5 border border-neutral-200 bg-white">
+              <h3 className="text-neutral-900 mb-4">활동 요약</h3>
               <div className="space-y-3">
-                {currentReport.sessions.slice(0, 10).map((session, index) => (
-                  <div key={index} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-                    <div>
-                      <p className="font-medium">{session.date}</p>
-                      <p className="text-sm text-gray-600">{session.exercises.join(', ')}</p>
-                    </div>
-                    <div className="text-right">
-                      <Badge
-                        className={
-                          session.exerciseType === 'strength'
-                            ? 'bg-blue-100 text-blue-700'
-                            : session.exerciseType === 'flexibility'
-                              ? 'bg-green-100 text-green-700'
-                              : 'bg-orange-100 text-orange-700'
-                        }
-                      >
-                        {session.exerciseType === 'strength'
-                          ? '근력'
-                          : session.exerciseType === 'flexibility'
-                            ? '유연성'
-                            : '지구력'}
-                      </Badge>
-                      <p className="text-xs text-gray-500 mt-1">{session.duration}분</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        {/* FIT-DNA 이력 탭 */}
-        <TabsContent value="fitdna-history">
-          <Card>
-            <CardHeader>
-              <CardTitle>FIT-DNA 검사 이력</CardTitle>
-              <CardDescription>체력 측정 및 FIT-DNA 유형 변화 기록</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <div className="p-4 bg-purple-50 border-l-4 border-purple-500 rounded">
-                  <div className="flex justify-between items-center mb-2">
-                    <span className="font-bold">현재 유형</span>
-                    <Badge className="bg-purple-600 text-white">
-                      {mockUser.fitDnaType} - {mockUser.fitDnaName}
-                    </Badge>
-                  </div>
-                  <p className="text-sm text-gray-600">검사일: 2025-11-15</p>
+                <div>
+                  <p className="text-neutral-600 text-sm mb-1">가입일</p>
+                  <p className="text-neutral-900">2025.01.15</p>
                 </div>
-
-                <div className="p-4 bg-gray-50 rounded">
-                  <div className="flex justify-between items-center mb-2">
-                    <span className="font-medium text-gray-700">이전 유형</span>
-                    <Badge className="bg-gray-400 text-white">PSE - 파워 러너</Badge>
-                  </div>
-                  <p className="text-sm text-gray-600">검사일: 2025-10-01</p>
+                <div>
+                  <p className="text-neutral-600 text-sm mb-1">총 운동 일수</p>
+                  <p className="text-neutral-900">48일</p>
                 </div>
-
-                <div className="p-4 bg-gray-50 rounded">
-                  <div className="flex justify-between items-center mb-2">
-                    <span className="font-medium text-gray-700">최초 유형</span>
-                    <Badge className="bg-gray-400 text-white">LSQ - 유연성 초보</Badge>
-                  </div>
-                  <p className="text-sm text-gray-600">검사일: 2025-09-01</p>
+                <div>
+                  <p className="text-neutral-600 text-sm mb-1">총 운동 시간</p>
+                  <p className="text-neutral-900">32시간</p>
                 </div>
               </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
+            </Card>
 
-        {/* 설정 탭 */}
-        <TabsContent value="settings">
-          <Card>
-            <CardHeader>
-              <CardTitle>설정</CardTitle>
-              <CardDescription>개인정보 및 알림 설정</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <div className="flex justify-between items-center p-4 bg-gray-50 rounded-lg">
-                  <div>
-                    <p className="font-medium">운동 알림</p>
-                    <p className="text-sm text-gray-600">정기적인 운동 리마인더를 받습니다</p>
-                  </div>
-                  <Button variant="outline" size="sm">
-                    설정
-                  </Button>
+            {/* App Info */}
+            <Card className="p-5 border border-neutral-200 bg-white">
+              <h3 className="text-neutral-900 mb-4">앱 정보</h3>
+              <div className="space-y-2 text-sm">
+                <div className="flex justify-between">
+                  <span className="text-neutral-600">버전</span>
+                  <span className="text-neutral-900">1.0.0</span>
                 </div>
-                <div className="flex justify-between items-center p-4 bg-gray-50 rounded-lg">
-                  <div>
-                    <p className="font-medium">목표 설정</p>
-                    <p className="text-sm text-gray-600">주간 운동 목표를 설정합니다</p>
-                  </div>
-                  <Button variant="outline" size="sm">
-                    설정
-                  </Button>
-                </div>
-                <div className="flex justify-between items-center p-4 bg-gray-50 rounded-lg">
-                  <div>
-                    <p className="font-medium">개인정보 관리</p>
-                    <p className="text-sm text-gray-600">이메일, 비밀번호 변경</p>
-                  </div>
-                  <Button variant="outline" size="sm">
-                    변경
-                  </Button>
-                </div>
-                <div className="flex justify-between items-center p-4 bg-red-50 rounded-lg">
-                  <div>
-                    <p className="font-medium text-red-700">계정 삭제</p>
-                    <p className="text-sm text-red-600">계정과 모든 데이터가 삭제됩니다</p>
-                  </div>
-                  <Button variant="destructive" size="sm">
-                    삭제
-                  </Button>
+                <div className="flex justify-between">
+                  <span className="text-neutral-600">최신 업데이트</span>
+                  <span className="text-neutral-900">2025.11.28</span>
                 </div>
               </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
+            </Card>
+          </div>
+        </div>
+      </main>
     </div>
   );
 }
