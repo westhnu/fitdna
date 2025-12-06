@@ -10,7 +10,8 @@ from app.models import (
     FitnessMeasurement, FitDNAResult, LifestyleSurvey,
     WorkoutSession, UserGoal,
     DailyCondition, InjuryRisk,
-    MatchingPreference, Match, MatchStatusEnum
+    MatchingPreference, Match, MatchStatusEnum,
+    Facility
 )
 
 
@@ -282,6 +283,51 @@ def create_user_goals(db, user_id):
     print(f"✅ 사용자 목표 생성: {len(goals)}개")
 
 
+def create_facilities(db):
+    """주요 운동 시설 - 서울 지역 샘플"""
+    facilities = [
+        # 강남 지역
+        Facility(name="강남 스포츠센터", type="체육관", address="서울 강남구 테헤란로 123",
+                 sports="헬스,수영,요가", latitude=37.4979, longitude=127.0276),
+        Facility(name="역삼 휘트니스", type="헬스장", address="서울 강남구 역삼동 456",
+                 sports="헬스,PT", latitude=37.4999, longitude=127.0364),
+        Facility(name="논현 요가원", type="요가", address="서울 강남구 논현동 789",
+                 sports="요가,필라테스", latitude=37.5105, longitude=127.0223),
+
+        # 강북 지역
+        Facility(name="강북 종합 체육관", type="체육관", address="서울 강북구 수유동 234",
+                 sports="농구,배드민턴,탁구", latitude=37.6390, longitude=127.0259),
+        Facility(name="수유 수영장", type="수영장", address="서울 강북구 수유동 567",
+                 sports="수영,아쿼로빅", latitude=37.6398, longitude=127.0252),
+
+        # 마포 지역
+        Facility(name="홍대 클라이밍", type="클라이밍", address="서울 마포구 홍익로 789",
+                 sports="클라이밍", latitude=37.5564, longitude=126.9246),
+        Facility(name="상수 필라테스", type="필라테스", address="서울 마포구 상수동 101",
+                 sports="필라테스", latitude=37.5478, longitude=126.9221),
+
+        # 송파 지역
+        Facility(name="잠실 스포츠센터", type="체육관", address="서울 송파구 잠실동 123",
+                 sports="헬스,수영,에어로빅", latitude=37.5133, longitude=127.1028),
+        Facility(name="석촌 헬스클럽", type="헬스장", address="서울 송파구 석촌동 456",
+                 sports="헬스,크로스핏", latitude=37.5054, longitude=127.1062),
+
+        # 용산 지역
+        Facility(name="이촌 수영장", type="수영장", address="서울 용산구 이촌동 234",
+                 sports="수영", latitude=37.5245, longitude=126.9655),
+
+        # 서초 지역
+        Facility(name="서초 종합운동장", type="운동장", address="서울 서초구 서초동 789",
+                 sports="축구,농구,배구", latitude=37.4836, longitude=127.0327),
+        Facility(name="방배 테니스장", type="테니스장", address="서울 서초구 방배동 123",
+                 sports="테니스", latitude=37.4814, longitude=126.9963),
+    ]
+
+    db.add_all(facilities)
+    db.commit()
+    print(f"✅ 운동 시설 생성: {len(facilities)}개")
+
+
 def create_matching_data(db, user_id):
     """매칭 선호도 및 더미 매칭 파트너"""
     # 매칭 선호도
@@ -368,7 +414,10 @@ def seed_all():
         # 7. 사용자 목표
         create_user_goals(db, user.id)
 
-        # 8. 매칭 데이터
+        # 8. 운동 시설
+        create_facilities(db)
+
+        # 9. 매칭 데이터
         create_matching_data(db, user.id)
 
         print("\n✅ 시드 데이터 생성 완료!")
