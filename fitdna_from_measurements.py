@@ -7,7 +7,7 @@ import pickle
 from fitdna_calculator import calculate_fitdna, get_fitdna_description, classify_axis_levels
 
 
-def load_reference_table(pkl_path='fitdna_original_reference.pkl'):
+def load_reference_table(pkl_path='FITDNA_ref_new.pkl'):
     """참조 테이블 로드"""
     with open(pkl_path, 'rb') as f:
         return pickle.load(f)
@@ -56,7 +56,7 @@ def calculate_fitdna_from_measurements(
     gender,
     measurements,
     ref_table,
-    threshold=0.0,
+    threshold=0.25,
     debug=False
 ):
     """

@@ -4,7 +4,7 @@ FIT-DNA 계산 모듈
 """
 
 
-def classify_axis_levels(strength_z, flex_z, endurance_z, threshold=0.0):
+def classify_axis_levels(strength_z, flex_z, endurance_z, threshold=0.25):
     """
     각 축(근력/유연성/지구력)의 High/Low 여부를 반환
 
@@ -28,7 +28,7 @@ def classify_axis_levels(strength_z, flex_z, endurance_z, threshold=0.0):
     return strength_level, flex_level, endurance_level
 
 
-def calculate_fitdna(strength_z, flex_z, endurance_z, threshold=0.0):
+def calculate_fitdna(strength_z, flex_z, endurance_z, threshold=0.25):
     """
     Z-Score를 입력받아 FIT-DNA 유형 계산
 
