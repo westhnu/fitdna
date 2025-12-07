@@ -63,13 +63,13 @@ async def health_check():
     return {"status": "healthy"}
 
 
-# 정적 파일 서빙 (웹 디렉토리)
-WEB_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "web")
-if os.path.exists(WEB_DIR):
-    app.mount("/static", StaticFiles(directory=WEB_DIR), name="static")
+# 정적 파일 서빙 (프론트엔드 디렉토리)
+FRONTEND_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "frontend")
+if os.path.exists(FRONTEND_DIR):
+    app.mount("/static", StaticFiles(directory=FRONTEND_DIR), name="static")
 
     @app.get("/test")
     async def serve_test_page():
         """테스트 페이지 제공"""
-        test_file = os.path.join(WEB_DIR, "test-integration.html")
+        test_file = os.path.join(FRONTEND_DIR, "test-integration.html")
         return FileResponse(test_file)

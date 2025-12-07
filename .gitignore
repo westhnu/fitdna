@@ -83,3 +83,14 @@ backend/facilities_data.json
 최종/
 *.CSV
 
+# 생성된 데이터베이스
+*.db
+*.sqlite
+*.sqlite3
+
+# 분석 결과 파일
+*.png
+phase*.txt
+phase*.csv
+*.json.backup
+

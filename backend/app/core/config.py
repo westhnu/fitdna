@@ -42,8 +42,8 @@ class Settings(BaseSettings):
     KAKAO_REST_API_KEY: str = ""
 
     # 모델 파일 경로
-    FITDNA_REFERENCE_TABLE: str = "../fitdna_original_reference.pkl"
-    EXERCISE_RECOMMENDATION_FILE: str = "../phase2_exercise_recommendation.csv"
+    FITDNA_REFERENCE_TABLE: str = "./data/fitdna_original_reference.pkl"
+    EXERCISE_RECOMMENDATION_DIR: str = "./data/exercise_recommendations"
 
     class Config:
         env_file = ".env"
