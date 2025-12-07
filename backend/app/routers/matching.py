@@ -5,9 +5,12 @@
 - 매칭 결과 조회
 """
 
-from fastapi import APIRouter, Query
+from fastapi import APIRouter, Query, Depends, HTTPException
 from pydantic import BaseModel
 from typing import List, Optional
+from sqlalchemy.orm import Session
+from app.core.database import get_db
+from app.models import Match, User, MatchStatusEnum
 
 router = APIRouter()
 
@@ -213,42 +216,156 @@ async def accept_match_request(match_id: int, user_id: int):
     }
 
 
+@router.get("/sent-requests")
+async def get_sent_requests(user_id: int, db: Session = Depends(get_db)):
+    """
+    내가 보낸 매칭 요청 목록
+    - requester_id == user_id인 매칭들
+    """
+    sent_requests = db.query(Match).filter(
+        Match.requester_id == user_id,
+        Match.status.in_([MatchStatusEnum.PENDING, MatchStatusEnum.ACCEPTED, MatchStatusEnum.REJECTED])
+    ).all()
+
+    result = []
+    for match in sent_requests:
+        # 상대방 정보 가져오기 (요청 받은 사람)
+        receiver_id = match.user2_id if match.user1_id == user_id else match.user1_id
+        receiver = db.query(User).filter(User.id == receiver_id).first()
+
+        if receiver:
+            result.append({
+                "match_id": match.id,
+                "receiver": {
+                    "id": receiver.id,
+                    "nickname": receiver.nickname,
+                    "fitdna_type": receiver.current_fitdna_type,
+                },
+                "compatibility_score": match.compatibility_score,
+                "common_exercises": match.common_exercises,
+                "status": match.status.value,
+                "request_date": match.created_at.date().isoformat() if match.created_at else None,
+            })
+
+    return {
+        "user_id": user_id,
+        "sent_requests": result,
+        "total": len(result)
+    }
+
+
+@router.get("/received-requests")
+async def get_received_requests(user_id: int, db: Session = Depends(get_db)):
+    """
+    받은 매칭 요청 목록
+    - (user1_id == user_id OR user2_id == user_id) AND requester_id != user_id
+    """
+    received_requests = db.query(Match).filter(
+        ((Match.user1_id == user_id) | (Match.user2_id == user_id)),
+        Match.requester_id != user_id,
+        Match.status.in_([MatchStatusEnum.PENDING, MatchStatusEnum.ACCEPTED, MatchStatusEnum.REJECTED])
+    ).all()
+
+    result = []
+    for match in received_requests:
+        # 요청자 정보 가져오기
+        requester = db.query(User).filter(User.id == match.requester_id).first()
+
+        if requester:
+            result.append({
+                "match_id": match.id,
+                "requester": {
+                    "id": requester.id,
+                    "nickname": requester.nickname,
+                    "fitdna_type": requester.current_fitdna_type,
+                },
+                "compatibility_score": match.compatibility_score,
+                "common_exercises": match.common_exercises,
+                "status": match.status.value,
+                "request_date": match.created_at.date().isoformat() if match.created_at else None,
+            })
+
+    return {
+        "user_id": user_id,
+        "received_requests": result,
+        "total": len(result)
+    }
+
+
 @router.get("/my-matches")
-async def get_my_matches(user_id: int):
+async def get_my_matches(user_id: int, db: Session = Depends(get_db)):
     """
     내 매칭 목록
     - 진행 중인 매칭, 완료된 매칭
     """
+    # 활성 매칭: ACTIVE 상태
+    active_matches_query = db.query(Match).filter(
+        ((Match.user1_id == user_id) | (Match.user2_id == user_id)),
+        Match.status == MatchStatusEnum.ACTIVE
+    ).all()
+
+    active_matches = []
+    for match in active_matches_query:
+        # 상대방 정보 가져오기
+        partner_id = match.user2_id if match.user1_id == user_id else match.user1_id
+        partner = db.query(User).filter(User.id == partner_id).first()
+
+        if partner:
+            active_matches.append({
+                "match_id": match.id,
+                "partner": partner.nickname,
+                "fitdna_type": partner.current_fitdna_type,
+                "matched_date": match.matched_date.isoformat() if match.matched_date else None,
+                "total_workouts_together": match.total_workouts_together,
+                "status": "활동 중"
+            })
+
+    # 대기 중인 요청: PENDING 상태
+    pending_requests_query = db.query(Match).filter(
+        ((Match.user1_id == user_id) | (Match.user2_id == user_id)),
+        Match.status == MatchStatusEnum.PENDING
+    ).all()
+
+    pending_requests = []
+    for match in pending_requests_query:
+        # 요청자 정보 가져오기
+        requester = db.query(User).filter(User.id == match.requester_id).first()
+
+        if requester:
+            pending_requests.append({
+                "match_id": match.id,
+                "requester": requester.nickname,
+                "fitdna_type": requester.current_fitdna_type,
+                "request_date": match.created_at.date().isoformat() if match.created_at else None,
+                "status": "대기 중"
+            })
+
+    # 과거 매칭: ENDED 상태
+    past_matches_query = db.query(Match).filter(
+        ((Match.user1_id == user_id) | (Match.user2_id == user_id)),
+        Match.status == MatchStatusEnum.ENDED
+    ).all()
+
+    past_matches = []
+    for match in past_matches_query:
+        # 상대방 정보 가져오기
+        partner_id = match.user2_id if match.user1_id == user_id else match.user1_id
+        partner = db.query(User).filter(User.id == partner_id).first()
+
+        if partner:
+            past_matches.append({
+                "match_id": match.id,
+                "partner": partner.nickname,
+                "fitdna_type": partner.current_fitdna_type,
+                "matched_date": match.matched_date.isoformat() if match.matched_date else None,
+                "ended_date": match.ended_date.isoformat() if match.ended_date else None,
+                "total_workouts_together": match.total_workouts_together,
+                "status": "종료"
+            })
+
     return {
         "user_id": user_id,
-        "active_matches": [
-            {
-                "match_id": 1,
-                "partner": "런너123",
-                "fitdna_type": "PFE",
-                "matched_date": "2025-11-25",
-                "total_workouts_together": 5,
-                "status": "활동 중"
-            }
-        ],
-        "pending_requests": [
-            {
-                "match_id": 2,
-                "requester": "헬스매니아",
-                "fitdna_type": "PSE",
-                "request_date": "2025-11-30",
-                "status": "대기 중"
-            }
-        ],
-        "past_matches": [
-            {
-                "match_id": 3,
-                "partner": "요가러버",
-                "fitdna_type": "LFE",
-                "matched_date": "2025-09-10",
-                "ended_date": "2025-10-31",
-                "total_workouts_together": 12,
-                "status": "종료"
-            }
-        ]
+        "active_matches": active_matches,
+        "pending_requests": pending_requests,
+        "past_matches": past_matches
     }
