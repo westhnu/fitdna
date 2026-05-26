@@ -28,8 +28,8 @@ class Settings(BaseSettings):
     DATABASE_URL: str = "sqlite:///./fitdna.db"  # 개발용 SQLite
     # PostgreSQL 예시: "postgresql://user:password@localhost/fitdna"
 
-    # JWT 인증
-    SECRET_KEY: str = "your-secret-key-change-in-production"
+    # JWT 인증 — SECRET_KEY는 환경변수로 반드시 설정. 미설정 시 startup에서 raise.
+    SECRET_KEY: str = ""  # set via env (.env or process env)
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 7  # 7일
 
@@ -41,9 +41,9 @@ class Settings(BaseSettings):
     WEATHER_API_KEY: str = ""
     KAKAO_REST_API_KEY: str = ""
 
-    # 모델 파일 경로
-    FITDNA_REFERENCE_TABLE: str = "../fitdna_original_reference.pkl"
-    EXERCISE_RECOMMENDATION_FILE: str = "../phase2_exercise_recommendation.csv"
+    # 모델 파일 경로 (data/ 로 이동됨)
+    FITDNA_REFERENCE_TABLE: str = "../data/fitdna_original_reference.pkl"
+    EXERCISE_RECOMMENDATION_FILE: str = "../data/phase2_classified_exercise_database.csv"
 
     class Config:
         env_file = ".env"
@@ -51,3 +51,10 @@ class Settings(BaseSettings):
 
 
 settings = Settings()
+
+# Fail fast — production 에서는 절대 startup 가능 X
+if not settings.SECRET_KEY:
+    raise RuntimeError(
+        "SECRET_KEY가 비어있습니다. backend/.env 또는 환경변수로 설정하세요. "
+        "예: SECRET_KEY=$(openssl rand -hex 32)"
+    )

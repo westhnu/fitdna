@@ -77,9 +77,15 @@ htmlcov/
 # *.pkl
 # *.csv
 
-# 대용량 파일 제외
+# 대용량 raw 파일 (다운로드 출처는 README 참고)
 map_2k.html
 backend/facilities_data.json
 최종/
 *.CSV
+KS_NFA_FTNESS_MESURE_ITEM_MESURE_INFO_*.csv
+fit_dna_preprocessed_cp949.csv
+
+# 빌드 산출물
+Web/dist/
+Web/node_modules/
 
