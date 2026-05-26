@@ -3,9 +3,9 @@
 > 체력 측정 데이터로 **나의 체력 유형(8가지 FIT-DNA)** 을 알아보고, 그에 맞는 운동·시설을 추천받는 플랫폼.
 > "내가 어떤 운동을 해야 하는지 알기 어렵다"는 흔한 고민을 데이터로 풀어보려고 만들었습니다.
 
+[![Live Demo](https://img.shields.io/badge/Live-fitdna.vercel.app-000000?logo=vercel)](https://fitdna.vercel.app/)
+[![API Docs](https://img.shields.io/badge/API-Swagger%20UI-009688?logo=fastapi)](https://fitdna-backend.onrender.com/api/docs)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
-![Backend](https://img.shields.io/badge/Backend-FastAPI-009688)
-![Frontend](https://img.shields.io/badge/Frontend-React%20+%20Vite-646cff)
 
 ![8 FIT-DNA Types](analysis/phase1_fitdna_radar_charts.png)
 
