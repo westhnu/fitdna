@@ -1,0 +1,25 @@
+# Render Blueprint — FIT-DNA Backend.
+# Blueprint 모드로 연결하면 이 파일만으로 서비스 생성·env 셋업까지 자동.
+# Database 없이 SQLite ephemeral 로 시작 — 포트폴리오 데모용. 영속 저장 필요 시
+# Render PostgreSQL 또는 Neon/Supabase 로 DATABASE_URL 만 바꾸면 됨.
+
+services:
+  - type: web
+    name: fitdna-backend
+    runtime: python
+    rootDir: backend
+    region: singapore
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.12.0"
+      - key: DATABASE_URL
+        value: sqlite:///./fitdna.db
+      - key: SECRET_KEY
+        generateValue: true
+      - key: ALLOWED_ORIGINS
+        value: '["*"]'
+    autoDeploy: true

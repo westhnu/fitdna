@@ -3,7 +3,11 @@
  * FastAPI 백엔드와 통신
  */
 
-const API_BASE_URL = 'http://localhost:8001/api';
+// Vercel 등 운영 환경에선 VITE_API_BASE_URL 로 백엔드 도메인 주입.
+// 미설정 시 로컬 개발용 기본값 사용 (Vite dev server proxy 와 호환).
+const API_BASE_URL =
+  (import.meta as unknown as { env?: { VITE_API_BASE_URL?: string } }).env
+    ?.VITE_API_BASE_URL || 'http://localhost:8001/api';
 
 // API 응답 타입
 export interface FitDNAResult {
